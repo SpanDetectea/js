@@ -1,54 +1,4 @@
-class Library {
-    #books
-
-    constructor(initialBooks = []) {
-        if (new Set(initialBooks).size !== initialBooks.length) {
-            throw new Error("Начальный список книг содержит дубликаты.");
-        }
-        this.#books = [...initialBooks];
-    }
-
-    get allBooks() {
-        return this.#books
-    }
-    addBook(title) {
-        if (!this.#books[title]) {
-            this.#books.push(title)
-            return
-        }
-        throw new Error('Книга уже добавлена')
-    }
-    removeBook(title) {
-        if (this.#books.includes(title)) {
-            this.#books = [this.#books.filter(item => item != title)]
-            return
-        }
-        throw new Error('Такой книги не существует')
-    }
-    hasBook(title) {
-        return this.#books.includes(title)
-    }
-}
-
-try {
-    const myLibrary = new Library(["1984", "Гарри Поттер", "Властелин колец"]);
-    console.log(myLibrary.allBooks);
-
-    myLibrary.addBook("Дюна");
-    console.log(myLibrary.allBooks);
-
-    console.log(myLibrary.hasBook("Дюна"));
-    myLibrary.removeBook("Дюна");
-    console.log(myLibrary.allBooks);
-
-    console.log(myLibrary.hasBook("Дюна"));
-} catch (error) {
-    console.error(error.message);
-}
-console.log('----------------')
-// task 2
-
-const initialData = [
+let initialData = [
     {
         product: "Apple iPhone 13",
         reviews: [
@@ -114,9 +64,24 @@ function loadReviews(index) {
         const reviewBoxEl = document.createElement('div')
         reviewBoxEl.classList.add('review__wrapper__elements')
         reviewBoxEl.textContent = review.text
+        const deleteButton = document.createElement('button')
+        deleteButton.textContent = 'Удалить'
+        deleteButton.addEventListener('click', e =>deleteReview(index, review.id))
+        reviewBoxEl.appendChild(deleteButton)
         wrapper.appendChild(reviewBoxEl)
     })
 }
+function deleteReview(product, id) {
+    const newData = initialData[product].reviews.filter(review => {
+       return  review.id != id
+    })
+    console.log(newData)
+    initialData[product].reviews = newData
+    localStorage.clear();
+    localStorage.setItem('database', JSON.stringify(initialData))
+    loadReviews(product)
+}
+
 function submit() {
     const textInput = text.value;
     const indexProduct = select.value
@@ -128,9 +93,10 @@ function submit() {
         text: textInput,
     }
     initialData[indexProduct].reviews.push(newReview)
-    console.log(initialData[indexProduct])
+    localStorage.setItem('database', JSON.stringify(initialData))
     loadReviews(indexProduct)
     text.value = ""
+    id++;
 }
 select.addEventListener('change', e => loadReviews(e.target.value))
 
